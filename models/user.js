@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 
 //shcema for users and admin
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
     {
         email: {
             type: String,
@@ -26,13 +26,18 @@ const userSchema = mongoose.Schema(
     }
 )
 
-userSchema.pre('save', async (next)=>{
-    if(!this.modified('password')) return next()
-    this.password = bcrypt.hash(password, 12)
+userSchema.pre('save', async function(next){
+    //if password was modified
+    if(!this.isModified('password')) return next()
+    //hash the password by 12
+    this.password = await bcrypt.hash(this.password, 12)
+    //delete the password confirm
+    this.passwordConfirm = undefined
 
-    this.password = undefined
     next()
 })
+
+
 
 userSchema.methods.comparePassword = async(candidatepassword, userpassword)=>{
     return await bcrypt.compare(candidatepassword, userpassword)

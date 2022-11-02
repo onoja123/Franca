@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 router.route("/")
-.get("/", authController.protect ,userController.getUsers)
+.get(authController.protect ,userController.getUsers)
 .post(userController.createUser)
 
 //Only admin can delete user

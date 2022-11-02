@@ -1,7 +1,5 @@
 const app = require("./app")
-const http = require("https")
 const mongoose = require("mongoose")
-const server = http.createServer(app)
 const dotenv = require("dotenv")
 const { config } = require("process")
 
@@ -35,10 +33,9 @@ mongoose.connect(DB, {
 const PORT = process.env.PORT || 3000
 
 //server listening to port
-server.listen(PORT, ()=>{
-    console.log(`server running on PORT ${PORT}`)
-})
-
+const server = app.listen(PORT, () => {
+  console.log(`server running on port ${PORT}...`);
+});
 
 process.on("unhandledRejection", err =>{
     console.log('UNHANDLED REJECTION! 💥 Shutting down...');

@@ -4,7 +4,7 @@ const catchAsync = require("./../utils/catchAsync")
 exports.getUsers = catchAsync(async(req, res, next) =>{
         const all = await user.find()
 
-        res.statusCode(200).json({
+        res.status(200).json({
             status: "sucess",
             length: user.length,
             data: {
@@ -17,7 +17,7 @@ exports.getUsers = catchAsync(async(req, res, next) =>{
 exports.createUser = catchAsync(async(req, res, next) =>{
         const newuser = await user.create(req.body)
 
-        res.statusCode(200).json({
+        res.status(200).json({
             status: "sucess",
             data: {
                 new: newuser
