@@ -1,7 +1,7 @@
 const express = require('express')
 
-const userController = require('./../controllers/user')
-const authController = require('./../controllers/auth')
+const userController = require('../controllers/userController')
+const authController = require('../controllers/authController')
 const router = express.Router()
 
 
@@ -13,7 +13,7 @@ router.route("/")
 //Only admin can delete user
 router.route("/:id")
 .get(userController.findUser)
-.delete(authController.protect ,authController.protect("admin"),userController.deleteUser)
+.delete(authController.protect ,authController.restrict("admin"),userController.deleteUser)
 .patch(userController.updateUser)
 
 

@@ -1,30 +1,38 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
+const cyrpto = require("crypto")
 
-//shcema for users and admin
 const userSchema = new mongoose.Schema(
     {
-        email: {
+        name: {
             type: String,
-            required: [true, 'please input an email']
+            required: [true, "please put it a name"],
+
+        },
+        email : {
+            type: String,
+            required: [true, "please put in an email"]
+        },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user"
         },
         password: {
             type: String,
             required: [true, "please put it an password"],
             select: false
         },
-        role:{
-            type: String,
-            enum: ["admin"],
-            default: "user"
-        },
         passwordConfirm: {
             type: String,
             required: [true, "please confirm your [password"]
         },
-        passwordChangedAt: Date
+        changedPasswordAt: Date,
+        passwordResetToken: String,
+        passwordExpiresToken: Date
     }
 )
+
 
 userSchema.pre('save', async function(next){
     //if password was modified
@@ -37,21 +45,26 @@ userSchema.pre('save', async function(next){
     next()
 })
 
-
-
-userSchema.methods.comparePassword = async(candidatepassword, userpassword)=>{
-    return await bcrypt.compare(candidatepassword, userpassword)
+userSchema.methods.correctPassword = async function(candidatePassword, userPassword){
+    return await bcrypt.compare(candidatePassword, userPassword)
 }
 
-userSchema.methods.changedPassword = async(JWTTimestamp)=>{
-    if(this.passwordChangedAt){
-        const timeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10)
-        return timeStamp < this.passwordChangedAt
+userSchema.methods.changedPasswordAfter = async function(JWTTimestamp){
+    if(this.changedPasswordAt){
+        const changedStamp = parseInt(this.changedPasswordAt.getTime() / 1000, 10)
+        return JWTTimestamp > changedStamp;
     }
     return false
 }
 
+userSchema.methods.createPasswordResetToken = async function(){
+    const resetToken = crypto.randomBytes(32).toISOString('hex')
+    this.passwordResetToken = cyrpto.createHash("sha256").update(resetToken).digest('hex')
+    this.passwordExpiresToken = Date.now() + 10 * 60 * 1000
 
+    console.log({resetToken}, this.passwordResetToken)
+    return resetToken
+}
 const User = mongoose.model("User", userSchema)
 
 module.exports = User

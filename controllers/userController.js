@@ -1,5 +1,5 @@
-const user = require("./../models/user")
-const catchAsync = require("./../utils/catchAsync")
+const user = require("../models/user")
+const catchAsync = require("../utils/catchAsync")
 
 exports.getUsers = catchAsync(async(req, res, next) =>{
         const all = await user.find()
