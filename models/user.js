@@ -1,13 +1,41 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
-const cyrpto = require("crypto")
+const crypto = require('crypto')
 
 const userSchema = new mongoose.Schema(
     {
+        user_type: {
+            enum: ["beginner", "intermediate", "advanced"]
+        },
         name: {
             type: String,
             required: [true, "please put it a name"],
-
+        },
+        is_student: {
+            type: Boolean,
+            default: true
+        },
+        is_tutor: {
+            type: Boolean,
+            default: true
+        },
+        is_organization: {
+            type: Boolean,
+            default: true
+        },
+        profile_photo: {
+            type: string
+        },
+        short_bio: {
+            type: string
+        },
+        phone_number: {
+            type: Number,
+            required: [true, "please input a number"]
+        },
+        address: {
+            type: String,
+            required: [true, "please input an address"]
         },
         email : {
             type: String,
@@ -25,7 +53,7 @@ const userSchema = new mongoose.Schema(
         },
         passwordConfirm: {
             type: String,
-            required: [true, "please confirm your [password"]
+            required: [true, "please confirm your password"]
         },
         changedPasswordAt: Date,
         passwordResetToken: String,
@@ -58,8 +86,8 @@ userSchema.methods.changedPasswordAfter = async function(JWTTimestamp){
 }
 
 userSchema.methods.createPasswordResetToken = async function(){
-    const resetToken = crypto.randomBytes(32).toISOString('hex')
-    this.passwordResetToken = cyrpto.createHash("sha256").update(resetToken).digest('hex')
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest('hex')
     this.passwordExpiresToken = Date.now() + 10 * 60 * 1000
 
     console.log({resetToken}, this.passwordResetToken)
