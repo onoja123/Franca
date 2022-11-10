@@ -2,8 +2,8 @@ const express = require("express")
 const globalErrorHandler = require('./controllers/errorController');
 const morgan = require("morgan")
 const AppError = require("./utils/AppError")
-const userR = require("./routes/user")
-const authR = require("./routes/auth")
+const userRoute = require("./routes/user")
+const authRoute = require("./routes/auth")
 const app = express()
 
 if(process.env.NODE_ENV === 'development'){
@@ -13,12 +13,14 @@ if(process.env.NODE_ENV === 'development'){
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/user", userR)
-app.use("/api/auth", authR)
+app.use("/api/user", userRoute)
+app.use("/api/auth", authRoute)
 
 app.use(globalErrorHandler)
+
+
 app.get("/", (req, res)=>{
-    res.send("server running")
+    res.send("Franca server running")
 })
 
 // app.use((req, res, next)=>{

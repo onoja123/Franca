@@ -5,7 +5,9 @@ const crypto = require('crypto')
 const userSchema = new mongoose.Schema(
     {
         user_type: {
-            enum: ["beginner", "intermediate", "advanced"]
+            type: String,
+            enum: ["beginner", "intermediate", "advanced"],
+            default: "beginner"
         },
         name: {
             type: String,
@@ -18,16 +20,16 @@ const userSchema = new mongoose.Schema(
         is_tutor: {
             type: Boolean,
             default: true
-        },
+        },  
         is_organization: {
             type: Boolean,
             default: true
         },
-        profile_photo: {
-            type: string
-        },
+        // profile_photo: {
+        //     type: string
+        // },
         short_bio: {
-            type: string
+            type: String
         },
         phone_number: {
             type: Number,
@@ -70,6 +72,13 @@ userSchema.pre('save', async function(next){
     //delete the password confirm
     this.passwordConfirm = undefined
 
+    next()
+})
+
+userSchema.pre('save', function(next){
+    if(!this.isModified('password') || this.isNew) return next()
+
+    this.passwordConfirm = Date.now() - 1000;
     next()
 })
 

@@ -1,10 +1,10 @@
-const User = require("../models/user")
-const catchAsync = require("../utils/catchAsync")
-const AppError = require("../utils/appError")
-const jwt = require("jsonwebtoken")
-const sendEmail = require("./../utils/email")
+const crypto = require('crypto');
 const { promisify } = require('util');
-
+const jwt = require('jsonwebtoken');
+const User = require('./../models/user');
+const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
+const sendEmail = require('./../utils/email');
 /**
  *
  *
@@ -17,19 +17,21 @@ const signToken = id =>{
     })
 }
 
-//signup routes
-exports.signup = catchAsync(async(req, res, next)=>{
-    const Token = signToken(User._id)
-    const newUser = await User.create(req.body)
-    res.status(200).json({
+const createSendToken = (user, statusCode, res) =>{
+    const token = signToken(user._id)
+    res.status(statusCode).json({
         status: "sucess",
-        message: "sucessfully signedup",
-        Token,
+        token,
         data: {
-            user: newUser,
-            
+            user
         }
     })
+}
+
+//signup routes
+exports.signup = catchAsync(async(req, res, next)=>{
+    const newUser = await User.create(req.body)
+    createSendToken(newUser, 201, res)
 })
 
 exports.login = catchAsync(async(req, res, next)=>{
@@ -49,12 +51,7 @@ exports.login = catchAsync(async(req, res, next)=>{
     }
   
     //once everything is okay, send token
-    const Token = signToken(user._id)
-    res.status(200).json({
-        status: 'sucess',
-        Token
-
-    })
+    createSendToken(user, 200, res)
 })
 
 
@@ -65,13 +62,13 @@ exports.protect = catchAsync(async(req, res, next)=>{
     if(
         req.headers.authorization 
         &&
-        req.headers.authorization.startsWith("bearer")
+        req.headers.authorization.startsWith("Bearer")
         ){
             token = req.headers.authorization.split(' ')[1]
         }
 
         if(!token){
-            return next(new AppError(""))
+            return next(new AppError("you are not loggeg in! please log in to get access."), 401)
         }
     //verfication of token
         const decoded = promisify(jwt.verify)(token, process.env.JWT_SECRET_kEY)
@@ -90,6 +87,7 @@ exports.protect = catchAsync(async(req, res, next)=>{
 
     //Grant acces to protected route
     req.user = currentuser
+    next()
 
 })
 
@@ -97,9 +95,10 @@ exports.protect = catchAsync(async(req, res, next)=>{
 //admin only
 exports.restrict = (...roles)=>{
     return(req, res, next)=>{
-        if(!roles.includes(req.user.id)){
-            return next (new AppError("you are not allowed, please leave here right away"), 402)
+        if(!roles.includes(req.user.roles)){
+            return next (new AppError('You do not have permission to perform this action', 403))
         }
+        next()
     }
 }
 
@@ -110,7 +109,7 @@ exports.forgotPassword = catchAsync(async(req, res, next)=>{
     const user = await User.findOne({email: req.body.email})
 
     if(!user){
-        return next(new AppError("There is no email with this email address"), 401)
+        return next(new AppError("There is no email with this email address"), 404)
     }
 
     const resetToken = user.createPasswordResetToken()
@@ -169,10 +168,22 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
 
     await user.save()
 
-    const token = signToken(user._id)
-    res.status(200).json({
-        status: "sucess",
-        token
-    })
+    createSendToken(user, 200, res)
 })
 
+
+
+exports.updatePassword = catchAsync(async(req, res, next)=>{
+    const user =  await User.findById(req.user.id).select('password')
+
+    if(!(await user.correctPassword(req.body.passwordCurrent, user.password))){
+        return next(new AppError("Your current password is wrong"), 401)
+    }
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.psswordConfirm
+
+    await user.save()
+
+    createSendToken(user, 200, res)
+})
