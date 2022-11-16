@@ -1,39 +1,58 @@
-const User = require('./../models/user');
+const User = require('../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
 
-const filterObj = (obj, ...allowedFields) => {
-    const newObj = {};
-    Object.keys(obj).forEach(el => {
-      if (allowedFields.includes(el)) newObj[el] = obj[el];
-    });
-    return newObj;
-  };
 
-  exports.updateUser = catchAsync(async (req, res, next) => {
-    //  Create error if user POSTs password data
-    if (req.body.password || req.body.passwordConfirm) {
-      return next(
-        new AppError(
-          'This route is not for password updates. Please use /updateMyPassword.',
-          400
-        )
-      );
+//Get users profile
+exports.getprofile = catchAsync(async(req, res, next)=>{
+  const details = await User.find()
+
+  res.status(201).json({
+    status: "Sucess",
+    data:{
+      new: details
     }
+  })
+})
+
+
+
+//create Profile
+exports.createuser = catchAsync(async(req, res, next)=>{
+
+  const {name, is_student, profile_picture, short_bio, phone_number, address, email} = req.body
+ 
+    const newUser = await User.create(
+      {
+      name: name,
+      is_student: is_student,
+      profile_picture: profile_picture,
+      short_bio: short_bio,
+      phone_number: phone_number,
+      address: address,
+      email: email
+    }
+      )
   
-    // Filtered out unwanted fields names that are not allowed to be updated
-    const filteredBody = filterObj(req.body, 'name', 'email');
+      res.status(201).json({
+        status: "sucess",
+        data: {
+          new: newUser
+        }
+      })
+})
   
-    // Update user document
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-      new: true,
-      runValidators: true
-    });
-  
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: updatedUser
+
+//update profile
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const input =  req.body;
+    const updatedUser = User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true
+  })
+      res.status(200).json({
+        status: 'success',
+         data: {
+         user: updatedUser
       }
-    });
-  });
+    }
+  )
+});

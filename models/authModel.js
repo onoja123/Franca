@@ -2,55 +2,25 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 const crypto = require('crypto')
 
-const userSchema = new mongoose.Schema(
+const authSchema = new mongoose.Schema(
     {
-        user_type: {
-            type: String,
-            enum: ["beginner", "intermediate", "advanced"],
-            default: "beginner"
-        },
         name: {
             type: String,
             required: [true, "please put it a name"],
         },
-        is_student: {
-            type: Boolean,
-            default: true
-        },
-        is_tutor: {
-            type: Boolean,
-            default: true
-        },  
-        is_organization: {
-            type: Boolean,
-            default: true
-        },
-        // profile_photo: {
-        //     type: string
-        // },
-        short_bio: {
-            type: String
-        },
-        phone_number: {
-            type: Number,
-            required: [true, "please input a number"]
-        },
-        address: {
-            type: String,
-            required: [true, "please input an address"]
-        },
         email : {
             type: String,
-            required: [true, "please put in an email"]
-        },
-        role: {
-            type: String,
-            enum: ["user", "admin"],
-            default: "user"
+            required: [true, "please put in an email"],
+            trim: true,
+            unique: true,
+            match: [
+              /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+              "Please enter a valid Email address",
+            ],
         },
         password: {
             type: String,
-            required: [true, "please put it an password"],
+            required: [true, "please put it a password"],
             select: false
         },
         passwordConfirm: {
@@ -60,11 +30,15 @@ const userSchema = new mongoose.Schema(
         changedPasswordAt: Date,
         passwordResetToken: String,
         passwordExpiresToken: Date
+    },
+    {
+        timestamps: true
+
     }
 )
 
 
-userSchema.pre('save', async function(next){
+authSchema.pre('save', async function(next){
     //if password was modified
     if(!this.isModified('password')) return next()
     //hash the password by 12
@@ -75,18 +49,18 @@ userSchema.pre('save', async function(next){
     next()
 })
 
-userSchema.pre('save', function(next){
+authSchema.pre('save', function(next){
     if(!this.isModified('password') || this.isNew) return next()
 
     this.passwordConfirm = Date.now() - 1000;
     next()
 })
 
-userSchema.methods.correctPassword = async function(candidatePassword, userPassword){
+authSchema.methods.correctPassword = async function(candidatePassword, userPassword){
     return await bcrypt.compare(candidatePassword, userPassword)
 }
 
-userSchema.methods.changedPasswordAfter = async function(JWTTimestamp){
+authSchema.methods.changedPasswordAfter = async function(JWTTimestamp){
     if(this.changedPasswordAt){
         const changedStamp = parseInt(this.changedPasswordAt.getTime() / 1000, 10)
         return JWTTimestamp > changedStamp;
@@ -94,7 +68,7 @@ userSchema.methods.changedPasswordAfter = async function(JWTTimestamp){
     return false
 }
 
-userSchema.methods.createPasswordResetToken = async function(){
+authSchema.methods.createPasswordResetToken = async function(){
     const resetToken = crypto.randomBytes(32).toString('hex')
     this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest('hex')
     this.passwordExpiresToken = Date.now() + 10 * 60 * 1000
@@ -102,6 +76,6 @@ userSchema.methods.createPasswordResetToken = async function(){
     console.log({resetToken}, this.passwordResetToken)
     return resetToken
 }
-const User = mongoose.model("User", userSchema)
+const Auth = mongoose.model("Auth", authSchema)
 
-module.exports = User
+module.exports = Auth;

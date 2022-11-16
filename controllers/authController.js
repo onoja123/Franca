@@ -1,10 +1,13 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const User = require('./../models/user');
+const User = require('../models/authModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
+require("./../utils/cloudinary")
+
+
 /**
  *
  *
@@ -33,6 +36,8 @@ exports.signup = catchAsync(async(req, res, next)=>{
     const newUser = await User.create(req.body)
     createSendToken(newUser, 201, res)
 })
+
+
 
 exports.login = catchAsync(async(req, res, next)=>{
     //check if user and password exist
@@ -84,7 +89,7 @@ exports.protect = catchAsync(async(req, res, next)=>{
     if(currentuser.changedPasswordAfter(decoded.iat)){
         return next (new AppError("user recently changed password, please login again"), 401)
     }
-
+    
     //Grant acces to protected route
     req.user = currentuser
     next()
