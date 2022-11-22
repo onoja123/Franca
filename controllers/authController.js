@@ -5,7 +5,6 @@ const User = require('../models/authModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
-require("./../utils/cloudinary")
 
 
 /**
@@ -61,40 +60,49 @@ exports.login = catchAsync(async(req, res, next)=>{
 
 
 
-exports.protect = catchAsync(async(req, res, next)=>{
-    //Get token and check if it's there
+exports.protect = catchAsync(async (req, res, next) => {
+    // 1) Getting token and check of it's there
     let token;
-    if(
-        req.headers.authorization 
-        &&
-        req.headers.authorization.startsWith("Bearer")
-        ){
-            token = req.headers.authorization.split(' ')[1]
-        }
-
-        if(!token){
-            return next(new AppError("you are not loggeg in! please log in to get access."), 401)
-        }
-    //verfication of token
-        const decoded = promisify(jwt.verify)(token, process.env.JWT_SECRET_kEY)
-    //check if user exist
-        const currentuser = await User.findById(decoded.id)
-        if(!currentuser){
-            return next(new AppError("The user belonging to this token doesnt exist", 401))
-        }
-
-
-    //check if user chnaged password after token was issued
-
-    if(currentuser.changedPasswordAfter(decoded.iat)){
-        return next (new AppError("user recently changed password, please login again"), 401)
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
     }
-    
-    //Grant acces to protected route
-    req.user = currentuser
-    next()
+  
+    if (!token) {
+      return next(
+        new AppError('You are not logged in! Please log in to get access.', 401)
+      );
+    }
+  
+    // 2) Verification token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET_kEY);
+  
+    // 3) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next(
+        new AppError(
+          'The user belonging to this token does no longer exist.',
+          401
+        )
+      );
+    }
+  
+    // 4) Check if user changed password after the token was issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError('User recently changed password! Please log in again.', 401)
+      );
+    }
+  
+    // GRANT ACCESS TO PROTECTED ROUTE
+    req.user = currentUser;
+    next();
+  });
 
-})
+
 
 
 //admin only
@@ -164,7 +172,7 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
     //Check if token expired, and if there is user, set new password
 
     if(!user){
-        return next(new AppError("Token is invalid or has expired"), 400)
+        return next(new AppError("Token is invalid or has expired"), 401)
     }
     user.password = req.body.password,
     user.passwordConfirm = req.body.passwordConfirm,
@@ -178,17 +186,21 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
 
 
 
-exports.updatePassword = catchAsync(async(req, res, next)=>{
-    const user =  await User.findById(req.user.id).select('password')
 
-    if(!(await user.correctPassword(req.body.passwordCurrent, user.password))){
-        return next(new AppError("Your current password is wrong"), 401)
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    //  Get user from collection
+    const user = await User.findById(req.user.id).select('+password');
+  
+    //  Check if POSTed current password is correct
+    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+      return next(new AppError('Your current password is wrong.', 401));
     }
-
+  
+    // If so, update password
     user.password = req.body.password;
-    user.passwordConfirm = req.body.psswordConfirm
-
-    await user.save()
-
-    createSendToken(user, 200, res)
-})
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+  
+    //  Log user in, send JWT
+    createSendToken(user, 200, res);
+  });

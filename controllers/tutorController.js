@@ -36,7 +36,9 @@ exports.createProfile = catchAsync(async(req, res, next)=>{
 
         }
       )
-  
+  if(!newUser){
+    return next(new AppError)
+  }
       res.status(201).json({
         status: "sucess",
         data: {
@@ -48,18 +50,19 @@ exports.createProfile = catchAsync(async(req, res, next)=>{
 
 //update profile
 exports.updateUser = catchAsync(async (req, res, next) => {
-    const input =  req.body;
-    const updatedUser = User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true
-    })
-   
-      res.status(200).json({
-          status: 'success',
-           data: {
-           user: updatedUser
-        }
-      }
-    )
-  });
 
+  const updatedUser = await Tutor.findByIdAndUpdate(req.params.id, req.body, {
+    new: true
+})
 
+if (!updatedUser) {
+  return next(new AppError('No Tutor found with that ID', 404));
+}
+    res.status(200).json({
+      status: 'success',
+       data: {
+       user: updatedUser
+    }
+  }
+)
+});

@@ -15,17 +15,12 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         },
-        is_tutor: {
-            type: Boolean,
-            default: true
-        },  
-        is_organization: {
-            type: Boolean,
-            default: true
-        },
-        profile_photo: {
-            type: String
-        },
+        avatar: {
+            type: String,
+          },
+          cloudinary_id: {
+            type: String,
+          },
         short_bio: {
             type: String
         },

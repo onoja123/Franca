@@ -15,7 +15,6 @@ exports.getprofile = catchAsync(async(req, res, next)=>{
 })
 
 
-
 //create Profile
 exports.createuser = catchAsync(async(req, res, next)=>{
 
@@ -44,10 +43,14 @@ exports.createuser = catchAsync(async(req, res, next)=>{
 
 //update profile
 exports.updateUser = catchAsync(async (req, res, next) => {
-  const input =  req.body;
-    const updatedUser = User.findByIdAndUpdate(req.params.id, req.body, {
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true
   })
+
+  if (!updatedUser) {
+    return next(new AppError('No user found with that ID', 404));
+  }
       res.status(200).json({
         status: 'success',
          data: {
@@ -56,3 +59,19 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     }
   )
 });
+
+exports.deleteUser = catchAsync(async(req, res, next)=>{
+  const de = await User.findByIdAndDelete(req.params.id, req.body)
+
+  if (!del) {
+    return next(new AppError('No user found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status:"sucess",
+    data: null
+  })
+})
+
+
+

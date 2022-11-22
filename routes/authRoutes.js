@@ -3,21 +3,21 @@ const router = express()
 
 const authController = require("../controllers/authController")
 
-//signup users
-router.route("/signup")
-.post(authController.signup)
 
 //signup users
-router.route("/login")
-.post(authController.login)
+router.post('/signup', authController.signup);
 
-router.route("/forgotPassword")
-.post(authController.forgotPassword)
+//login users
+router.post('/login', authController.login);
 
-router.route("/resetPassword/:token")
-.patch(authController.resetPassword)
+//ForgotPassword
+router.post('/forgotPassword', authController.forgotPassword);
 
-router.route("/updatePassword/:token")
+//ResetPassword
+router.patch('/resetPassword/:token', authController.resetPassword);
+
+//UpdatePassword
+router.route("/updatePassword")
 .patch(authController.protect, authController.updatePassword)
 
 module.exports = router;

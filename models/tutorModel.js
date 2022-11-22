@@ -18,10 +18,7 @@ const tutorSchema = new mongoose.Schema(
         },
         phone_number: {
             type: Number
-        },  
-        is_organization: {
-            type: Boolean,
-            default: true
+        
         },
         address: {
             type: String
