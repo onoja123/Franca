@@ -18,9 +18,9 @@ const userSchema = new mongoose.Schema(
         avatar: {
             type: String,
           },
-          cloudinary_id: {
+        cloudinary_id: {
             type: String,
-          },
+        },
         short_bio: {
             type: String
         },

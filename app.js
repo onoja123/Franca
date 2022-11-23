@@ -5,6 +5,7 @@ const AppError = require("./utils/AppError")
 const userRoute = require("./routes/studentRoutes")
 const authRoute = require("./routes/authRoutes")
 const tutorRoute = require("./routes/tutorRoutes")
+const cors = require("cors");
 
 
 const app = express()
@@ -21,7 +22,7 @@ app.use("/api/auth", authRoute)
 app.use("/api/tutor", tutorRoute)
 
 app.use(globalErrorHandler)
-
+app.use(cors())
 
 app.get("/", (req, res)=>{
     res.send("Franca server running")
