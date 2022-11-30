@@ -25,7 +25,7 @@ const DB = process.env.DATABASE.replace(
 mongoose.connect(DB, {
     useNewUrlParser: true
 }).then(()=>{
-    console.log("database connected sucessfully")
+    console.log("Database connected sucessfully")
 })
 
 //defining port
@@ -36,7 +36,7 @@ const PORT = process.env.PORT || 3000
 //server listening to port
 /** @type {*} */
 const server = app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}...`);
+  console.log(`Server running on port ${PORT}...`);
 });
 
 process.on("unhandledRejection", err =>{

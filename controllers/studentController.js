@@ -1,10 +1,11 @@
 const User = require('../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
-
+const AppError = require("./../utils/appError")
 
 //Get users profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
   const details = await User.find()
+
 
   res.status(201).json({
     status: "Sucess",

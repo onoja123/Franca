@@ -14,7 +14,6 @@ exports.getprofile = catchAsync(async(req, res, next)=>{
 })
 
 
-
 //create Profile
 exports.createProfile = catchAsync(async(req, res, next)=>{
 
@@ -37,7 +36,7 @@ exports.createProfile = catchAsync(async(req, res, next)=>{
         }
       )
   if(!newUser){
-    return next(new AppError)
+    return next(new AppError("You are not a tutor please sign up"), 404)
   }
       res.status(201).json({
         status: "sucess",
