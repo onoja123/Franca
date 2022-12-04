@@ -1,6 +1,7 @@
 const Tutor = require('../models/tutorModel');
 const catchAsync = require('./../utils/catchAsync');
 
+
 //Get users profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
   const details = await Tutor.find()

@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
         },
         name: {
             type: String,
-            required: [true, "please put it a name"],
+            required: [true, "please put it a name"]
         },
         is_student: {
             type: Boolean,

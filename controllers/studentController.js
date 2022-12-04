@@ -2,6 +2,16 @@ const User = require('../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require("./../utils/appError")
 
+
+const filterObj = (obj, ...allowedFields)=>{
+  const newObj = {}
+
+  Object.keys(filterObj).forEach(el =>{
+    if(allowedFields.includes(el)) newObj[el] = obj[el]
+  })
+  return newObj
+}
+
 //Get users profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
   const details = await User.find()
@@ -44,9 +54,16 @@ exports.createuser = catchAsync(async(req, res, next)=>{
 
 //update profile
 exports.updateUser = catchAsync(async (req, res, next) => {
+  if(req.body.password || req.body.passwordConfirm){
+    return next(new AppError("This is not the route for password update"), 404)
+  }
 
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
+  //filter out unwated field name that are not allowed to be updated
+
+  const filter = filterObj(req.body, "name", "email", "profile_picture")
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, filter , {
+      new: true,
+      runValidators: true
   })
 
   if (!updatedUser) {
@@ -62,13 +79,13 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async(req, res, next)=>{
-  const de = await User.findByIdAndDelete(req.params.id, req.body)
+  const de = await User.findByIdAndDelete(req.user.id, {active: false})
 
   if (!del) {
     return next(new AppError('No user found with that ID', 404));
   }
 
-  res.status(200).json({
+  res.status(204).json({
     status:"sucess",
     data: null
   })

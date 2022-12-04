@@ -72,8 +72,8 @@ router.route("/create").post(studentcontroller.createuser)
 
 router.route("/getprofile").get(studentcontroller.getprofile)
 
-router.route("/edit/:id").patch(studentcontroller.updateUser)
+router.route("/edit/:id").patch(authController.protect ,studentcontroller.updateUser)
 
-router.route("/delete/:id").delete(authController.restrict("admin") ,studentcontroller.deleteUser)
+router.route("/delete/:id").delete(authController.restrict("admin") , authController.protect ,studentcontroller.deleteUser)
 
 module.exports = router;

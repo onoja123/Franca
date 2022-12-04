@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 const crypto = require('crypto')
+const validator = require("validator")
 
 const authSchema = new mongoose.Schema(
     {
@@ -17,6 +18,7 @@ const authSchema = new mongoose.Schema(
               /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
               "Please enter a valid Email address",
             ],
+            validate: [validator.isEmail, 'Please provide a valid email']
         },
         password: {
             type: String,
@@ -29,7 +31,12 @@ const authSchema = new mongoose.Schema(
         },
         changedPasswordAt: Date,
         passwordResetToken: String,
-        passwordExpiresToken: Date
+        passwordExpiresToken: Date,
+        active: {
+          type: Boolean,
+          default: true,
+          select: false
+        }
     },
     {
         timestamps: true
@@ -55,6 +62,11 @@ authSchema.pre('save', function(next) {
   
     this.passwordChangedAt = Date.now() - 1000;
     next();
+});
+
+authSchema.pre(/^find/, function(next){
+  this.find({active: {$ne: false}})
+  next()
 });
   
 
