@@ -27,11 +27,9 @@ const tutorSchema = new mongoose.Schema(
             type: String,
             required: [true, "please put in an email"]
         },
-        language_skills_1 :{ 
-            type: String
-        },
-        language_skills_2 : {
-            type: String
+        language_skills :{ 
+            type: String,
+            enum: ["Hausa", "igbo", "yoruba"]
         },
         role: {
             type: String,

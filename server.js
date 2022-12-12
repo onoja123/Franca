@@ -26,6 +26,8 @@ mongoose.connect(DB, {
     useNewUrlParser: true
 }).then(()=>{
     console.log("Database connected sucessfully")
+}).catch(err =>{
+  console.log(err.name, err.message)
 })
 
 //defining port

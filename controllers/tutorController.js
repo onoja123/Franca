@@ -66,3 +66,12 @@ if (!updatedUser) {
   }
 )
 });
+
+//create courses
+
+//edit courses
+
+//delete courses
+
+
+

@@ -5,7 +5,6 @@ const AppError = require("./../utils/appError")
 
 const filterObj = (obj, ...allowedFields)=>{
   const newObj = {}
-
   Object.keys(filterObj).forEach(el =>{
     if(allowedFields.includes(el)) newObj[el] = obj[el]
   })
@@ -59,9 +58,8 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   }
 
   //filter out unwated field name that are not allowed to be updated
-
   const filter = filterObj(req.body, "name", "email", "profile_picture")
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filter , {
+    const updatedUser = await User.findByIdAndUpdate(req.User.id, filter , {
       new: true,
       runValidators: true
   })
@@ -79,7 +77,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async(req, res, next)=>{
-  const de = await User.findByIdAndDelete(req.user.id, {active: false})
+  const de = await User.findByIdAndDelete(req.User.id, {active: false})
 
   if (!del) {
     return next(new AppError('No user found with that ID', 404));

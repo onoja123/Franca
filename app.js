@@ -5,6 +5,7 @@ const AppError = require("./utils/AppError")
 const userRoute = require("./routes/studentRoutes")
 const authRoute = require("./routes/authRoutes")
 const tutorRoute = require("./routes/tutorRoutes")
+const blogRoute = require("./routes/blogRoutes")
 const cors = require("cors");
 const rateLimit = require("express-rate-limit")
 const helmet = require("helmet")
@@ -42,6 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoute)
 app.use("/api/auth", authRoute)
 app.use("/api/tutor", tutorRoute)
+app.use("/api/blog", blogRoute)
 
 app.use(globalErrorHandler)
 

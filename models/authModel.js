@@ -31,12 +31,7 @@ const authSchema = new mongoose.Schema(
         },
         changedPasswordAt: Date,
         passwordResetToken: String,
-        passwordExpiresToken: Date,
-        active: {
-          type: Boolean,
-          default: true,
-          select: false
-        }
+        passwordExpiresToken: Date
     },
     {
         timestamps: true
@@ -64,11 +59,6 @@ authSchema.pre('save', function(next) {
     next();
 });
 
-authSchema.pre(/^find/, function(next){
-  this.find({active: {$ne: false}})
-  next()
-});
-  
 
   
 authSchema.methods.correctPassword = async function(
