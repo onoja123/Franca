@@ -30,6 +30,8 @@ mongoose.connect(DB, {
   console.log(err.name, err.message)
 })
 
+mongoose.set('strictQuery', false);
+
 //defining port
 
 /** @type {*} */

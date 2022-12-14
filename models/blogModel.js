@@ -16,7 +16,7 @@ const blogSchema = new mongoose.Schema(
             required: false,
           },
           author: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.SchemaTypes.ObjectId,
             ref: "User",
           },
           active: {
@@ -24,6 +24,10 @@ const blogSchema = new mongoose.Schema(
             default: true,
             select: false
           },
+          createdAt: {
+            type: Date,
+            defualt: Date.now()
+          }
     },
     {
         timestamps: true

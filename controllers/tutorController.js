@@ -1,6 +1,25 @@
 const Tutor = require('../models/tutorModel');
 const catchAsync = require('./../utils/catchAsync');
+const student = require("./../models/userModel")
+const apiFeature = require('./../utils/apiFeatures')
 
+
+exports.getAllStudents = catchAsync(async(req, res, next)=>{
+  const stud = new apiFeature(student.find(), req.query)
+  .filter()
+  .sort()
+  .limitFields()
+  .pagination();
+
+  const all = await stud.query;
+
+  res.status(200).json({
+    status: "sucess",
+    data: {
+      new: all
+    }
+  })
+})
 
 //Get users profile
 exports.getprofile = catchAsync(async(req, res, next)=>{

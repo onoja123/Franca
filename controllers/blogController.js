@@ -4,8 +4,10 @@ const AppError = require("./../utils/appError")
 
 //Get all blogs
 exports.getAllBlog = catchAsync(async(req, res, next)=>{
-    const all = await Blog.find();
-
+    const all = await Blog.find()
+    if(!all){
+        return next(new AppError("No blog with that ID"), 403)
+    }
     res.status(200).json({
         status: "sucess",
         data: {
@@ -33,6 +35,10 @@ exports.createPost = catchAsync(async(req, res, next)=>{
 // Fnd blog
 exports.findPost = catchAsync(async(req, res, next)=>{
     const all = await Blog.findById(req.params.id)
+
+    if(!all){
+        return next(new AppError("No blog with that ID"), 403)
+    }
     res.status(200).json({
         status: "sucess",
         data: {

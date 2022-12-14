@@ -1,6 +1,4 @@
-const { schema } = require("../models/userModel");
-
-class apiFeatures{
+class apiFeature{
     constructor(query, queryString){
         this.query = query;
         this.query = queryString
@@ -48,60 +46,4 @@ class apiFeatures{
     }
 
 
-// tour.aggregate([
-//     {
-//         $match: {ratingAvr: {$gte: 4.5}}
-//     },
-//     {
-//         $group: {
-//             _id: null,
-//             sumP: {$max: "price"},
-//             avgR: {$avg: "ratingAvr"},
-//             avgPrice: {$avg: "price"},
-//             minPrice: {$min: "price"},
-//             maxPrice: {$max: "price"}
-//         }
-//     }
-// ])
-
-// tour.agregate([
-//     {
-//         $unwind: {
-//             $gte: "startDate"
-//         },
-//         {
-//             $match: {
-//                 startDate: {
-//                     $gte: {`{year}-1-1`},
-//                     $lte: {``}
-//                 }
-//             }
-//         }
-//     }
-// ])
-
-
-schenma.pre("svae", function(next){
-   return this.duration / 7;
-
-   next()
-})
-
-schema.virtuals("durationWeek").get(function(next){
-    return this.duration /7 ;
-
-    next()
-})
-
-schmea.pre("find", function(next){
-    this.find({$ne: true})
-
-    next()
-})
-
-
-shcmea.pre("save", function(next){
-    this.slug = this.slugify(this.name, {loweCase: true})
-
-    next()
-})
+module.exports = apiFeature
