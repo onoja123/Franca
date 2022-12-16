@@ -4,7 +4,8 @@ const AppError = require("./../utils/appError")
 
 //Get all blogs
 exports.getAllBlog = catchAsync(async(req, res, next)=>{
-    const all = await Blog.find()
+    const all = await Blog.find().populate({path:"./User"},{ select: "name user_type role"})
+
     if(!all){
         return next(new AppError("No blog with that ID"), 403)
     }
@@ -13,7 +14,7 @@ exports.getAllBlog = catchAsync(async(req, res, next)=>{
         data: {
             new: all
         }
-    })
+    })    
 })
 
 // Create blog
