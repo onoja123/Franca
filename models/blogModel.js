@@ -16,8 +16,8 @@ const blogSchema = new mongoose.Schema(
             required: false,
           },
           author: {
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: "User",
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
           },
           active: {
             type: Boolean,
@@ -38,7 +38,13 @@ blogSchema.pre(/^find/, function(next){
     next()
   });
 
-
+  blogSchema.pre(/^find/, function(next){
+       this.populate({
+     path: 'author',
+     select: 'name'
+      })
+      next()
+  })
 
 const Blog = mongoose.model("Blog", blogSchema)
 

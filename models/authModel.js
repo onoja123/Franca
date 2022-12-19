@@ -5,10 +5,14 @@ const validator = require("validator")
 
 const authSchema = new mongoose.Schema(
     {
-        name: {
+        first_name: {
             type: String,
             required: [true, "please put it a name"],
         },
+        last_name: {
+          type: String,
+          required: [true, "please put it a name"],
+      },
         email : {
             type: String,
             required: [true, "please put in an email"],
@@ -83,6 +87,7 @@ authSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
   };
   
 authSchema.methods.createPasswordResetToken = function() {
+  
     const resetToken = crypto.randomBytes(32).toString('hex');
   
     this.passwordResetToken = crypto

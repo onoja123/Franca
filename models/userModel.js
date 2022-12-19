@@ -2,15 +2,6 @@ const mongoose = require("mongoose")
 
 const userSchema = new mongoose.Schema(
     {
-        user_type: {
-            type: String,
-            enum: ["beginner", "intermediate", "advanced"],
-            default: "beginner"
-        },
-        name: {
-            type: String,
-            required: [true, "please put it a name"]
-        },
         is_student: {
             type: Boolean,
             default: true
@@ -30,10 +21,6 @@ const userSchema = new mongoose.Schema(
         address: {
             type: String
         },
-        email : {
-            type: String,
-            required: [true, "please put in an email"]
-        },
         role: {
             type: String,
             enum: ["student", "admin", "tutor", "organization"],
@@ -50,4 +37,4 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema)
 
-module.exports = User
+module.exports = User;

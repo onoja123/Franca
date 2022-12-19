@@ -20,4 +20,6 @@ router.patch('/resetPassword/:token', authController.resetPassword);
 router.route("/updatePassword")
 .patch(authController.protect, authController.updatePassword)
 
+router.route('/logout').get(authController.protect ,authController.logout);
+
 module.exports = router;

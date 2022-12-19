@@ -6,6 +6,8 @@ const userRoute = require("./routes/studentRoutes")
 const authRoute = require("./routes/authRoutes")
 const tutorRoute = require("./routes/tutorRoutes")
 const blogRoute = require("./routes/blogRoutes")
+const messageRoute = require("./routes/messRoute")
+const conversationRoute = require("./routes/convoRoute")
 const cors = require("cors");
 const rateLimit = require("express-rate-limit")
 const helmet = require("helmet")
@@ -44,6 +46,8 @@ app.use("/api/user", userRoute)
 app.use("/api/auth", authRoute)
 app.use("/api/tutor", tutorRoute)
 app.use("/api/blog", blogRoute)
+app.use("/api/message", messageRoute)
+app.use("/api/conversation", conversationRoute)
 
 app.use(globalErrorHandler)
 

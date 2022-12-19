@@ -1,18 +1,27 @@
 const Blog = require("./../models/blogModel")
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require("./../utils/appError")
+const apiFeature = require("./../utils/apiFeatures")
 
 //Get all blogs
 exports.getAllBlog = catchAsync(async(req, res, next)=>{
-    const all = await Blog.find().populate({path:"./User"},{ select: "name user_type role"})
+    const all =  new apiFeature(Blog.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate()
+    
 
-    if(!all){
+    const doc = await all.query;
+
+    if(!doc){
         return next(new AppError("No blog with that ID"), 403)
     }
     res.status(200).json({
         status: "sucess",
+        result: all.length,
         data: {
-            new: all
+            new: doc
         }
     })    
 })
@@ -33,7 +42,7 @@ exports.createPost = catchAsync(async(req, res, next)=>{
 })
 
 
-// Fnd blog
+// Find blog
 exports.findPost = catchAsync(async(req, res, next)=>{
     const all = await Blog.findById(req.params.id)
 

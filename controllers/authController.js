@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const User = require('../models/authModel');
+const Auth = require('../models/authModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError'); 
 const sendEmail = require('./../utils/email');
@@ -47,7 +47,14 @@ const createSendToken = (user, statusCode, res) =>{
 
 //signup routes
 exports.signup = catchAsync(async(req, res, next)=>{
-    const newUser = await User.create(req.body)
+  const {first_name, last_name, email, password,passwordConfirm} = req.body
+    const newUser = await Auth.create({
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      password: password,
+      passwordConfirm: passwordConfirm
+    })
     createSendToken(newUser, 201, res)
 })
 
@@ -63,7 +70,7 @@ exports.login = catchAsync(async(req, res, next)=>{
       return next(new AppError('Please provide email and password!', 400));
     }
     // 2) Check if user exists && password is correct
-    const user = await User.findOne({ email }).select('+password');
+    const user = await Auth.findOne({ email }).select('+password');
   
     if (!user || !(await user.correctPassword(password, user.password))) {
       return next(new AppError('Incorrect email or password', 401));
@@ -73,7 +80,15 @@ exports.login = catchAsync(async(req, res, next)=>{
     createSendToken(user, 200, res)
 })
 
+//login
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'successfully logged out' });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
     // 1) Getting token and check of it's there
@@ -95,7 +110,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET_kEY);
   
     // 3) Check if user still exists
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await Auth.findById(decoded.id);
     if (!currentUser) {
       return next(
         new AppError(
@@ -134,7 +149,7 @@ exports.restrict = (...roles)=>{
 exports.forgotPassword = catchAsync(async(req, res, next)=>{
     //Get user based on email
 
-    const user = await User.findOne({email: req.body.email})
+    const user = await Auth.findOne({email: req.body.email})
 
     if(!user){
         return next(new AppError("There is no email with this email address"), 404)
@@ -181,7 +196,7 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
     //Get user based on the token
     const hashedToken = crypto.createHash("sha256").update(req.params.token).digest('hex')
 
-    const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpires: {$gt: Date.now()}})
+    const user = await Auth.findOne({passwordResetToken: hashedToken, passwordResetExpires: {$gt: Date.now()}})
 
 
     //Check if token expired, and if there is user, set new password
@@ -204,7 +219,7 @@ exports.resetPassword = catchAsync(async(req, res, next)=>{
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
     //  Get user from collection
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await Auth.findById(req.user.id).select('+password');
   
     //  Check if POSTed current password is correct
     if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {

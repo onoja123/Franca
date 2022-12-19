@@ -69,7 +69,7 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
   
 
 router.route("/create").post(studentcontroller.createuser)
-
+router.route("/me").get(authController.protect, studentcontroller.getMe);
 router.route("/getprofile").get(studentcontroller.getprofile)
 
 router.route("/edit/:id").patch(authController.protect ,studentcontroller.updateUser)

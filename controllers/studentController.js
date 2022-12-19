@@ -11,11 +11,16 @@ const filterObj = (obj, ...allowedFields)=>{
   return newObj
 }
 
-//Get users profile
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+}
+
+
+//Get uers profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
   const details = await User.find()
-
-
   res.status(201).json({
     status: "Sucess",
     data:{
@@ -28,17 +33,15 @@ exports.getprofile = catchAsync(async(req, res, next)=>{
 //create Profile
 exports.createuser = catchAsync(async(req, res, next)=>{
 
-  const {name, is_student, profile_picture, short_bio, phone_number, address, email} = req.body
+  const {is_student, profile_picture, short_bio, phone_number, address} = req.body
  
     const newUser = await User.create(
       {
-      name: name,
       is_student: is_student,
       profile_picture: profile_picture,
       short_bio: short_bio,
       phone_number: phone_number,
       address: address,
-      email: email
     }
       )
   

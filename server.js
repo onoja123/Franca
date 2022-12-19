@@ -24,13 +24,14 @@ const DB = process.env.DATABASE.replace(
 
 mongoose.connect(DB, {
     useNewUrlParser: true
+    
 }).then(()=>{
     console.log("Database connected sucessfully")
 }).catch(err =>{
   console.log(err.name, err.message)
 })
 
-mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', true);
 
 //defining port
 
