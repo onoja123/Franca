@@ -15,7 +15,7 @@ const sendEmail = require('./../utils/email');
  * @return {*} 
  */
 const signToken = id =>{
-    return jwt.sign({id: id}, process.env.JWT_SECRET_kEY, {
+    return jwt.sign({id: id}, process.env.JWT_SECRET_KEY, {
         expiresIn: process.env.JWT_EXPIRES_IN
     })
 }
@@ -47,7 +47,7 @@ const createSendToken = (user, statusCode, res) =>{
 
 //signup routes
 exports.signup = catchAsync(async(req, res, next)=>{
-  const {first_name, last_name, email, password,passwordConfirm} = req.body
+  const {first_name, last_name, email, password, passwordConfirm} = req.body
     const newUser = await Auth.create({
       first_name: first_name,
       last_name: last_name,
@@ -55,7 +55,27 @@ exports.signup = catchAsync(async(req, res, next)=>{
       password: password,
       passwordConfirm: passwordConfirm
     })
-    createSendToken(newUser, 201, res)
+
+     //check for required fields
+     switch ((first_name, last_name, email, password, passwordConfirm)) {
+      case !username && !password && !email:
+        return res.status(400).send("Please fill in the required fields");
+      case !first_name:
+        return res.status(400).send("Please enter your firstname");
+      case !last_name:
+        return res.status(400).send("Please enter your lastname");
+      case !email:
+        return res.status(400).send("Please enter your email address");
+      case !password:
+        return res.status(400).send("Please enter your password");
+      case !passwordConfirm:n:
+        return res.status(400).send("Please confirm your password");
+    }
+
+    const existingEmail = await User.findOne({ email: req.body.email });
+    if (existingEmail)
+      return res.status(400).send("The email address is already exist");
+createSendToken(newUser, 201, res)
 })
 
 
@@ -64,11 +84,12 @@ exports.login = catchAsync(async(req, res, next)=>{
     //check if user and password exist
     
     const { email, password } = req.body;
-
-    // 1) Check if email and password exist
-    if (!email || !password) {
-      return next(new AppError('Please provide email and password!', 400));
+   // 1) Check if email and password exist
+    switch((email, password)){
+      case !email || password:
+        return  next(new AppError("Please provide email and password!"),400)
     }
+
     // 2) Check if user exists && password is correct
     const user = await Auth.findOne({ email }).select('+password');
   
@@ -107,7 +128,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     }
   
     // 2) Verification token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET_kEY);
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET_KEY);
   
     // 3) Check if user still exists
     const currentUser = await Auth.findById(decoded.id);
@@ -234,3 +255,4 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     //  Log user in, send JWT
     createSendToken(user, 200, res);
   });
+

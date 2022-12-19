@@ -33,6 +33,12 @@ const authSchema = new mongoose.Schema(
             type: String,
             required: [true, "please confirm your password"]
         },
+        userID: {
+          type: mongoose.SchemaTypes.ObjectId,
+          required: false,
+          ref: "user",
+          default: null,
+        },
         changedPasswordAt: Date,
         passwordResetToken: String,
         passwordExpiresToken: Date

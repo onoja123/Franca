@@ -2,6 +2,11 @@ const mongoose = require("mongoose")
 
 const userSchema = new mongoose.Schema(
     {
+        auth_id: {
+            type: mongoose.SchemaTypes.ObjectId,
+            required: [true, "a User cant be created without an authication handler"],
+            ref: "Auth",
+          },
         is_student: {
             type: Boolean,
             default: true

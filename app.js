@@ -58,7 +58,7 @@ app.get("/", (req, res)=>{
 })
 
 app.use("*", (req, res, next)=>{
-    next (new AppError(`cant find ${req.originalUrl} on this server`), 404)
+    next (new AppError(`Cant find ${req.originalUrl} on this server`), 404)
 })
 
 
