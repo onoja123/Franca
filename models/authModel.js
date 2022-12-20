@@ -33,7 +33,22 @@ const authSchema = new mongoose.Schema(
             type: String,
             required: [true, "please confirm your password"]
         },
-        userID: {
+        is_student: {
+            type: Boolean,
+            default: false,
+            required: [true]
+        },
+        is_tutor: {
+            type: Boolean,
+            default: false,
+            required: [true]
+        },
+        is_organization: {
+            type: Boolean,
+            default: false,
+            required: [true]
+        },
+        userId: {
           type: mongoose.SchemaTypes.ObjectId,
           required: false,
           ref: "user",
@@ -94,18 +109,19 @@ authSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
   
 authSchema.methods.createPasswordResetToken = function() {
   
-    const resetToken = crypto.randomBytes(32).toString('hex');
-  
-    this.passwordResetToken = crypto
-      .createHash('sha256')
-      .update(resetToken)
-      .digest('hex');
-  
-    console.log({ resetToken }, this.passwordResetToken);
-  
-    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  
-    return resetToken;
+     // Generate token
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  // Hash token and set to resetPasswordToken field
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set expire
+  this.passwordExpiresToken = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
   
   

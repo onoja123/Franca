@@ -20,7 +20,7 @@ exports.getMe = (req, res, next) => {
 
 //Get uers profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
-  const data = await User.find({_id: req.params.id}).select({auth_id:0, _id:0})
+  const data = await User.find({_id: req.user._id}).select({auth_id:0, _id:0})
   res.status(201).json({
     status: "Sucess",
     data:{

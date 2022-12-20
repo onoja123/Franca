@@ -7,15 +7,11 @@ const userSchema = new mongoose.Schema(
             required: [true, "a User cant be created without an authication handler"],
             ref: "Auth",
           },
-        is_student: {
-            type: Boolean,
-            default: true
-        },
         avatar: {
-            type: String,
+            type: String
           },
         cloudinary_id: {
-            type: String,
+            type: String
         },
         short_bio: {
             type: String
