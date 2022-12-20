@@ -58,7 +58,7 @@ exports.signup = catchAsync(async(req, res, next)=>{
 
      //check for required fields
      switch ((first_name, last_name, email, password, passwordConfirm)) {
-      case !username && !password && !email:
+      case !first_name && !last_name && !email && !password && !passwordConfirm :
         return res.status(400).send("Please fill in the required fields");
       case !first_name:
         return res.status(400).send("Please enter your firstname");
@@ -68,13 +68,9 @@ exports.signup = catchAsync(async(req, res, next)=>{
         return res.status(400).send("Please enter your email address");
       case !password:
         return res.status(400).send("Please enter your password");
-      case !passwordConfirm:n:
+      case !passwordConfirm:
         return res.status(400).send("Please confirm your password");
     }
-
-    const existingEmail = await User.findOne({ email: req.body.email });
-    if (existingEmail)
-      return res.status(400).send("The email address is already exist");
 createSendToken(newUser, 201, res)
 })
 
@@ -86,7 +82,7 @@ exports.login = catchAsync(async(req, res, next)=>{
     const { email, password } = req.body;
    // 1) Check if email and password exist
     switch((email, password)){
-      case !email || password:
+      case !email || !password:
         return  next(new AppError("Please provide email and password!"),400)
     }
 

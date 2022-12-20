@@ -1,38 +1,26 @@
 const Message = require("../models/messageModel")
 const catchAsync = require('../utils/catchAsync');
-const AppError = require("../utils/appError")
+const AppError = require("../utils/appError");
 
-exports.create = catchAsync(async(req, res, next)=>{
+exports.addMessage = catchAsync(async(req, res, next)=>{
+  // const {text, senderId, receiverId} = req.body;
+  const newMessage = new Message({
+    text: req.body.text,
+    senderId: req.body.senderId,
+    chatId: req.body.chatId
+  })
 
-
-  const savedMessage = await Message.create(req.body)
-
-  if(!savedMessage){
-    return next (new AppError("message not found"), 403)
-  }
+  const result = await newMessage.save()
 
   res.status(200).json({
     status: "sucess",
-    data: {
-      new: savedMessage
-    }
+    result
   })
 })
 
+exports.getChat = catchAsync(async(req, res, next)=>{
+  const {chatId} = req.params;
 
-exports.getId = catchAsync(async(req, res, next)=>{
-  const messageId = await Message.find({
-    conversationId: req.params.conversationId,
-  })
-
-  if(!messageId){
-    return next(new AppError("message not found"), 403)
-  }
-
-  res.status(200).json({
-    status: "sucess",
-    data: {
-      new: messageId
-    }
-  })
+  const result = await Message.find({ chatId });
+    res.status(200).json(result);
 })
