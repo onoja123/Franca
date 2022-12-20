@@ -164,21 +164,19 @@ exports.restrict = (...roles)=>{
 
 
 exports.forgotPassword = catchAsync(async(req, res, next)=>{
-  const { generateOTP } = require("../utils/otpGen")
     //Get user based on email
 
     const user = await Auth.findOne({email: req.body.email})
 
     if(!user){
-        return next(new AppError("There is no user with this email address"), 404)
+        return next(new AppError("There is no email with this email address"), 404)
     }
 
-    // const resetToken = user.createPasswordResetToken()
-       // Get reset token
-  const resetToken = generateOTP(4);
-  user.resetPasswordToken = resetToken;
+    const resetToken = user.createPasswordResetToken()
+
     await user.save({validateBeforeSave: false})
     
+
 console.log(resetToken)
       const resetURL = `${req.protocol}://${req.get(
     'host'
@@ -213,19 +211,18 @@ console.log(resetToken)
 
 exports.resetPassword = catchAsync(async(req, res, next)=>{
 
-  const { email, new_password } = req.body;
-  const user = await User.findOne({
-    email: email,
-  });
+    //Get user based on the token
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest('hex')
 
-  if (!user) {
-    return next(
-      new ErrorResponse(`User with this email ${email} does not exist`, 400)
-    );
-  }
+    const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpires: {$gt: Date.now()}})
 
-  // Set new password
-    user.password = new_password;
+  
+    //Check if token expired, and if there is user, set new password
+
+    if(!user){
+        return next(new AppError("Token is invalid or has expired"), 401)
+    }
+    user.password = req.body.password,
     user.passwordConfirm = req.body.passwordConfirm,
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined
