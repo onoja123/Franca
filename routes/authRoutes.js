@@ -9,17 +9,13 @@ router.post('/signup', authController.signup);
 
 //login users
 router.post('/login', authController.login);
-
 //ForgotPassword
 router.post('/forgotPassword', authController.forgotPassword);
 
-//ResetPassword
+//Reset Password
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-//UpdatePassword
-router.route("/updatePassword")
-.patch(authController.protect, authController.updatePassword)
-
-router.route('/logout').get(authController.protect ,authController.logout);
+//Logout
+router.route('/logout').get(authController.logout);
 
 module.exports = router;

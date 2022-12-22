@@ -1,8 +1,5 @@
 const Chat = require("../models/chatModel")
 const catchAsync = require('../utils/catchAsync');
-const AppError = require("../utils/appError")
-
-
 
 exports.createChat = catchAsync(async(req, res, next)=>{
   const newChat = new Chat({
@@ -10,7 +7,7 @@ exports.createChat = catchAsync(async(req, res, next)=>{
   });
   const result = await newChat.save();
   res.status(200).json({
-    sucess: "true",
+    sucess: true,
     result
   })
 
@@ -23,7 +20,7 @@ exports.findChat = catchAsync(async(req, res, next)=>{
   })
 
   res.status(200).json({
-    sucess: "true",
+    sucess: true,
     newChat
   })
  
@@ -35,7 +32,7 @@ exports.findTwo = catchAsync(async(req, res, next)=>{
     members: { $all: [req.params.firstId, req.params.secondId] },
   });
   res.status(200).json({
-    sucess: "true",
+    sucess: true,
     chat
   })
 })

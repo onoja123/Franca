@@ -18,7 +18,7 @@ exports.getAllBlog = catchAsync(async(req, res, next)=>{
         return next(new AppError("No blog with that ID"), 403)
     }
     res.status(200).json({
-        status: "sucess",
+        status: true,
         result: all.length,
         data: {
             new: doc
@@ -33,7 +33,7 @@ exports.createPost = catchAsync(async(req, res, next)=>{
         return next(new AppError("No blog with that ID"), 403)
     }
     res.status(201).json({
-        status: "sucess",
+        status: true,
         data: {
             new: data
         }
@@ -50,7 +50,7 @@ exports.findPost = catchAsync(async(req, res, next)=>{
         return next(new AppError("No blog with that ID"), 403)
     }
     res.status(200).json({
-        status: "sucess",
+        status: true,
         data: {
             data: {
                 new: all
@@ -70,7 +70,7 @@ exports.editPost = catchAsync(async(req, res, next)=>{
         return next(new AppError("No blog found with that ID"), 403)
     }
     res.status(200).json({
-        status: "sucess",
+        status: true,
         message: "blog deleted successfully",
         data: {
             data: {
@@ -89,7 +89,7 @@ exports.deletePost = catchAsync(async(req, res, next)=>{
     }
   
     res.status(204).json({
-      status:"sucess",
+      status:true,
       message: "blog deleted successfully",
       data: null
     })

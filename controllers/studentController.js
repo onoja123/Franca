@@ -12,48 +12,19 @@ const filterObj = (obj, ...allowedFields)=>{
 }
 
 
-exports.getMe = (req, res, next) => {
-  req.params.id = req.user.id;
-  next();
-}
-
-
 //Get uers profile
 exports.getprofile = catchAsync(async(req, res, next)=>{
-  const data = await User.find({_id: req.user._id}).select({auth_id:0, _id:0})
-  res.status(201).json({
-    status: "Sucess",
+  const user = await User.findById(req.user)
+  if(!user) return next(new AppError('Please login', 400))
+  res.status(200).json({
+    status: true,
     data:{
-      new: data
+      new: user
     }
   })
 })
 
 
-//create Profile
-exports.createuser = catchAsync(async(req, res, next)=>{
-
-  const {auth_id, is_student, profile_picture, short_bio, phone_number, address} = req.body
- 
-    const newUser = await User.create(
-      {
-      auth_id: auth_id,
-      is_student: is_student,
-      profile_picture: profile_picture,
-      short_bio: short_bio,
-      phone_number: phone_number,
-      address: address,
-    }
-      )
-  
-      res.status(201).json({
-        status: "sucess",
-        data: {
-          new: newUser
-        }
-      })
-})
-  
 
 //update profile
 exports.updateUser = catchAsync(async (req, res, next) => {
@@ -62,7 +33,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   }
 
   //filter out unwated field name that are not allowed to be updated
-  const filter = filterObj(req.body, "name", "email", "profile_picture")
+  const filter = filterObj(req.body,  "email")
     const updatedUser = await User.findByIdAndUpdate(req.params.id, filter , {
       new: true,
       runValidators: true
@@ -88,7 +59,8 @@ exports.deleteUser = catchAsync(async(req, res, next)=>{
   }
 
   res.status(204).json({
-    status:"sucess",
+    status:true,
     data: null
   })
 })
+

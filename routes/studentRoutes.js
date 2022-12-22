@@ -14,11 +14,8 @@ router.post("/", upload.single("image"), async (req, res) => {
   try {
     // Upload image to cloudinary
     const result = await cloudinary.uploader.upload(req.file.path);
-
     // Create new user
     let user = new User({
-      name: req.body.name,
-      email: req.body.email,
       avatar: result.secure_url,
       cloudinary_id: result.public_id,
     });
@@ -68,9 +65,7 @@ router.patch("/:id", upload.single("image"), async (req, res) => {
   });
   
 
-router.route("/create").post(studentcontroller.createuser)
-router.route("/me").get(authController.protect, studentcontroller.getMe);
-router.route("/getprofile").get(studentcontroller.getprofile)
+router.route("/getprofile/:id").get(studentcontroller.getprofile)
 
 router.route("/edit/:id").patch(authController.protect ,studentcontroller.updateUser)
 

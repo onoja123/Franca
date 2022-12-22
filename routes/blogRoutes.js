@@ -1,8 +1,8 @@
 const express = require("express")
 
 const router = express()
-const blogController = require("./../controllers/blogController")
-const authController = require("./../controllers/authController")
+const blogController = require("../controllers/blogController")
+const authController = require("../controllers/authController")
 
 router.route("/createBlog").post(blogController.createPost)
 router.route("/getAllBlogs").get(blogController.getAllBlog)
