@@ -50,15 +50,10 @@ const userSchema = new mongoose.Schema(
         phone_number: {
             type: Number
         },
-        address: {
-            type: String
-        },
-        request: {
-            type: String
-        },
-        title: {
-          type: String
-        },
+      request: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Blog"
+      },
         changedPasswordAt: Date,
         passwordResetToken: String,
         passwordExpiresToken: Date,
@@ -66,6 +61,11 @@ const userSchema = new mongoose.Schema(
           type: String,
           select: false,
         },
+        active: {
+          type: Boolean,
+          default: true,
+          select: false
+        }
     },
     {
         timestamps: true
@@ -93,6 +93,10 @@ userSchema.pre('save', function(next) {
     next();
 });
 
+userSchema.pre(/^find/, function(next){
+  this.find({active: {$ne: false}})
+  next()
+})
 
   
 userSchema.methods.correctPassword = async function(

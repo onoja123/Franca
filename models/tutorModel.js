@@ -2,16 +2,9 @@ const mongoose = require("mongoose")
 
 const tutorSchema = new mongoose.Schema(
     {
-        is_tutor: {
-            type: Boolean,
-            default: true
-        },
-        name: {
+        avatar: {
             type: String,
-            required: [true, "please put it a name"]
-        },
-        profile_photo: {
-            type: String
+            default: " "
         },
         short_bio: {
             type: String
@@ -23,18 +16,9 @@ const tutorSchema = new mongoose.Schema(
         address: {
             type: String
         },
-        email : {
-            type: String,
-            required: [true, "please put in an email"]
-        },
         language_skills :{ 
             type: String,
             enum: ["Hausa", "igbo", "yoruba"]
-        },
-        role: {
-            type: String,
-            enum: ["student", "admin", "tutor", "organization"],
-            default: "tutor"
         },
         eiffiency: {
             type: String

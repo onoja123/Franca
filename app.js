@@ -5,7 +5,7 @@ const AppError = require("./utils/appError")
 const userRoute = require("./routes/studentRoutes")
 const authRoute = require("./routes/authRoutes")
 const tutorRoute = require("./routes/tutorRoutes")
-const blogRoute = require("./routes/blogRoutes")
+const postRoute = require("./routes/postRoutes")
 const messageRoute = require("./routes/messageRoute")
 const chatRoute = require("./routes/chatRoute")
 const cors = require("cors");
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoute)
 app.use("/api/auth", authRoute)
 app.use("/api/tutor", tutorRoute)
-app.use("/api/blog", blogRoute)
+app.use("/api/post", postRoute )
 app.use("/api/message", messageRoute)
 app.use("/api/chat", chatRoute)
 

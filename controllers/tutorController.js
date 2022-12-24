@@ -34,10 +34,10 @@ exports.getprofile = catchAsync(async(req, res, next)=>{
 
   
 exports.deleteUser = catchAsync(async(req, res, next)=>{
-  const de = await User.findByIdAndDelete(req.User.id, {active: false})
+  const de = await Tutor.findByIdAndDelete(req.User.id, {active: false})
 
   if (!del) {
-    return next(new AppError('No user found with that ID', 404));
+    return next(new AppError('No Tutor found with that ID', 404));
   }
 
   res.status(204).json({

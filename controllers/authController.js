@@ -76,10 +76,11 @@ exports.signup = catchAsync(async(req, res, next)=>{
     })
 
     const emailToken = newUser.getVerifyEmailToken()
-    // const URL = "https://franca-test.onrender.com";
-    const resetURL = `${req.protocol}://${req.get(
-      'host'
-    )}/api/auth/verify/${emailToken}`;
+    const URL = "https://franca-test.onrender.com";
+    const resetURL = `${URL}/api/auth/verify/${emailToken}`
+    // const resetURL = `${req.protocol}://${req.get(
+    //   'host'
+    // )}/api/auth/verify/${emailToken}`;
   
     const message = `
     <p>Hi ${req.body.email}, welcome to Franca 🚀</p>
@@ -136,10 +137,11 @@ exports.resendVerification = catchAsync(async(req, res, next)=>{
 
     await user.save({validateBeforeSave: true});
 
-    // const URL = "https://franca-test.onrender.com";
-    const resetURL = `${req.protocol}://${req.get(
-      'host'
-    )}/api/auth/verify/${emailToken}`;
+    const URL = "https://franca-test.onrender.com";
+    const resetURL = `${URL}/api/auth/verify/${emailToken}`
+    // const resetURL = `${req.protocol}://${req.get(
+    //   'host'
+    // )}/api/auth/verify/${emailToken}`;
   
     const message = `
     <p>Hi ${req.body.email}, welcome to Franca 🚀</p>
@@ -288,10 +290,11 @@ exports.forgotPassword = catchAsync(async(req, res, next)=>{
     
 
   console.log(resetToken)
-      // const URL = "https://franca-test.onrender.com";
-      const resetURL = `${req.protocol}://${req.get(
-        'host'
-      )}/api/auth/resetPassword/${resetToken}`;
+      const URL = "https://franca-test.onrender.com";
+      const resetURL = `${URL}/api/auth/resetPassword/${resetToken}`;
+      // const resetURL = `${req.protocol}://${req.get(
+      //   'host'
+      // )}/api/auth/resetPassword/${resetToken}`;
     
           const message = `
           <p>Hi ${user.email}</p>

@@ -42,12 +42,6 @@ router.get("/get/all", studentcontroller.getAll)
 //Get profile
 router.route("/getprofile/:id").get(authController.protect ,studentcontroller.getprofile)
 
-//create a request
-
-router.post("/create/request", studentcontroller.request)
-
-router.get("/get/:id", studentcontroller.getRequest)
-
 //Delete account
 router.route("/delete/:id").delete(authController.restrict("admin") , authController.protect ,studentcontroller.deleteUser)
 

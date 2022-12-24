@@ -1,5 +1,22 @@
 const Chat = require("../models/chatModel")
 const catchAsync = require('../utils/catchAsync');
+const AppError = require("../utils/appError")
+const User = require("../models/userModel")
+
+
+exports.getUsers = catchAsync(async(req, res, next)=>{
+  const users = await User.find()
+
+  if(!users){
+    return next(new AppError("Cant find Users"), 403)
+  }
+  res.status(200).json({
+    status: true,
+    data: {
+      users
+    }
+  })
+})
 
 exports.createChat = catchAsync(async(req, res, next)=>{
   const newChat = new Chat({
