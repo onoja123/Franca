@@ -20,6 +20,7 @@ const signToken = id =>{
 }
 
 
+
 const createSendToken = (user, statusCode, res) =>{
     const token = signToken(user._id)
 
@@ -47,11 +48,11 @@ const createSendToken = (user, statusCode, res) =>{
 
 //signup routes
 exports.signup = catchAsync(async(req, res, next)=>{
-  const {first_name, last_name, email, user_type, password, passwordConfirm} = req.body;
+  const {first_name, last_name, email, user_type, password} = req.body;
  
      //check for required fields
-     switch ((first_name, last_name, email, user_type, password, passwordConfirm)) {
-      case !first_name && !last_name && !email && !password && !passwordConfirm :
+     switch ((first_name, last_name, email, user_type, password)) {
+      case !first_name && !last_name && !email && !user_type && !password:
         return res.status(400).send("Please fill in the required fields");
       case !first_name:
         return res.status(400).send("Please enter your firstname");
@@ -63,8 +64,6 @@ exports.signup = catchAsync(async(req, res, next)=>{
         return res.status(400).send("Please enter your user type");
       case !password:
         return res.status(400).send("Please enter your password");
-      case !passwordConfirm:
-        return res.status(400).send("Please confirm your password");
     }
 
     const newUser = await User.create({
@@ -73,14 +72,101 @@ exports.signup = catchAsync(async(req, res, next)=>{
       email: email,
       user_type: user_type,
       password: password,
-      passwordConfirm: passwordConfirm
+      
     })
 
+    const emailToken = newUser.getVerifyEmailToken()
+    // const URL = "https://franca-test.onrender.com";
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/auth/verify/${emailToken}`;
+  
+    const message = `
+    <p>Hi ${req.body.email}, welcome to Franca 🚀</p>
+    <p>Before doing anything, we recommend verifying your account to use most of the features available.</p>
+    <a href="${resetURL}" clicktracking=off>Verify Account</a>
+    <p>Franca. 🚀</p>
+`;
+  try {
+      await sendEmail({
+        email: newUser.email,
+        subject:  "Welcome to Franca 🚀",
+        message
+      });
+      
+  }catch(err){
+    newUser.getVerifyEmailToken = undefined
+    await newUser.save();
+
+    return res.status(500).send({
+      status: true,
+      message: "Couldn't send the verification email"});
+  }
   
 createSendToken(newUser, 201, res)
 })
 
 
+exports.verifyUsersEmail = catchAsync(async(req, res, next)=>{
+  const verifyEmailToken = await crypto
+  .createHash("sha256")
+  .update(req.params.token)
+  .digest("hex");
+
+  const user = await User.findOne({
+    verifyEmailToken: verifyEmailToken
+  }).select("+verifyEmailToken");
+
+
+  res.status(200).json({
+    status: true,
+    message: "Account verified"
+  })
+})
+
+
+exports.resendVerification = catchAsync(async(req, res, next)=>{
+
+  const user = await User.findOne({email: req.body.email})
+  if (!user) return res.status(400).json({
+    status: true,
+    message: "Please login"});
+
+  const emailToken = user.getVerifyEmailToken()
+
+    await user.save({validateBeforeSave: true});
+
+    // const URL = "https://franca-test.onrender.com";
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/auth/verify/${emailToken}`;
+  
+    const message = `
+    <p>Hi ${req.body.email}, welcome to Franca 🚀</p>
+    <p>Here's a new link to verify your account.</p>
+    <a href="${resetURL}" clicktracking=off>Verify Account</a>
+    <p>Franca. 🚀</p>
+`;
+  try {
+      await sendEmail({
+        email: user.email,
+        subject:  "Verification Link 🚀",
+        message
+      });
+
+      res.status(200).json({
+        status: true,
+        message: "Verification Link Sent!"});
+  }catch(err){
+    user.getVerifyEmailToken = undefined
+    await user.save();
+
+    return res.status(500).json({
+      status: true,
+      message: "Couldn't send the verification email"});
+  }
+
+})
 
 exports.login = catchAsync(async(req, res, next)=>{
     //check if user and password exist
@@ -202,8 +288,10 @@ exports.forgotPassword = catchAsync(async(req, res, next)=>{
     
 
   console.log(resetToken)
-      const URL = "https://franca-test.onrender.com";
-      const resetURL = `${URL}/api/auth/resetPassword/${resetToken}`;
+      // const URL = "https://franca-test.onrender.com";
+      const resetURL = `${req.protocol}://${req.get(
+        'host'
+      )}/api/auth/resetPassword/${resetToken}`;
     
           const message = `
           <p>Hi ${user.email}</p>
@@ -214,7 +302,7 @@ exports.forgotPassword = catchAsync(async(req, res, next)=>{
     try {
         await sendEmail({
           email: user.email,
-          subject: 'subject: "Password Reset',
+          subject: "Password Reset",
           message
         });
     

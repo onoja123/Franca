@@ -7,22 +7,21 @@ const blogSchema = new mongoose.Schema(
             required: [true, "Blog title required"],
             unique: true,
           },
-          description: {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+          request: {
             type: String,
             required: [true, "Blog description required"],
           },
           tags: {
-            type: Array,
+            type: [String],
             required: false,
           },
           author: {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
-          },
-          active: {
-            type: Boolean,
-            default: true,
-            select: false
           },
           createdAt: {
             type: Date,
@@ -38,13 +37,7 @@ blogSchema.pre(/^find/, function(next){
     next()
   });
 
-  blogSchema.pre(/^find/, function(next){
-       this.populate({
-     path: 'author',
-     select: 'name'
-      })
-      next()
-  })
+
 
 const Blog = mongoose.model("Blog", blogSchema)
 

@@ -36,13 +36,13 @@ const userSchema = new mongoose.Schema(
         },
         passwordConfirm: {
             type: String,
-            required: true
         },
         avatar: {
-          type: String
+          type: String,
+          default: " "
         },
         cloudinary_id: {
-            type: String
+            type: String,
         },
         short_bio: {
             type: String
@@ -56,10 +56,16 @@ const userSchema = new mongoose.Schema(
         request: {
             type: String
         },
-
+        title: {
+          type: String
+        },
         changedPasswordAt: Date,
         passwordResetToken: String,
         passwordExpiresToken: Date,
+        verifyEmailToken: {
+          type: String,
+          select: false,
+        },
     },
     {
         timestamps: true
@@ -127,9 +133,13 @@ userSchema.methods.createPasswordResetToken = function() {
   return resetToken;
 };
 
+userSchema.methods.getVerifyEmailToken = function(){
+  const resetToken = crypto.randomBytes(20).toString("hex")
+  this.verifyEmailToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
-  
-  
+  return resetToken;
+}
+
 const User = mongoose.model("User", userSchema)
 
 module.exports = User;
