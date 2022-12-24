@@ -198,14 +198,7 @@ exports.logout = async(req, res) => {
   try {
     res
       .status(200)
-      .cookie("accessToken", "", {
-        expiresIn: new Date(0),
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .cookie("refreshToken", "", {
+      .cookie("signToken", "", {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
